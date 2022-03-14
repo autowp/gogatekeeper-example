@@ -1,0 +1,14 @@
+client-id: client
+client-secret: 9lpm7v9PhgQDO8j3IOXqSIkI02BpZOxF
+discovery-url: http://ggk_keycloak:8080/auth/realms/interservice_auth
+#enable-refresh-tokens: true
+listen: ":8080"
+enable-default-deny: true
+resource:
+  - uri: /*
+    roles:
+      - server:ACCESS
+upstream-url: http://ggk_server:8080/
+verbose: true
+no-redirects: true
+skip-access-token-clientid-check: true

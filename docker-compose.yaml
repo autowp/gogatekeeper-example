@@ -1,0 +1,45 @@
+version: "3.5"
+
+services:
+  keycloak:
+    image: jboss/keycloak:16.1.1
+    container_name: ggk_keycloak
+    restart: always
+    environment:
+      DB_VENDOR: h2
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: password
+      KEYCLOAK_IMPORT: /tmp/realm.json
+      JAVA_OPTS_APPEND: "-Dkeycloak.profile.feature.upload_scripts=enabled"
+    volumes:
+      - ./realm.json:/tmp/realm.json:ro
+    ports:
+      - "8085:8080"
+
+  server:
+    image: nginxinc/nginx-unprivileged
+    container_name: ggk_server
+    restart: always
+    volumes:
+      - ./index.html:/usr/share/nginx/html/index.html
+    ports:
+      - "8086:8080"
+
+  client:
+    build:
+      context: .
+    container_name: ggk_client
+    restart: always
+    volumes:
+      - ./example.sh:/example.sh
+    entrypoint: "sleep 36000"
+
+  ggk:
+    image: quay.io/gogatekeeper/gatekeeper:1.4.0
+    container_name: ggk_ggk
+    restart: always
+    entrypoint: /opt/gatekeeper/gatekeeper --config=/config.yaml
+    volumes:
+      - ./ggk_config.yaml:/config.yaml:ro
+    ports:
+      - "8087:8080"
